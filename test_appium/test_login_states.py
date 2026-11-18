@@ -31,7 +31,7 @@ SERVER = 'http://127.0.0.1:4723'
 PKG = 'com.ted.ted_mobile_app_test'
 ACT = 'com.ted.ted_mobile_app_test.MainActivity'
 PLATFORM = os.environ.get('TARGET_PLATFORM', 'android')   # android | ios
-IOS_APP = os.path.expanduser('~/Documents/github_clashergeek77/mobile_app_mock/build/ios/iphonesimulator/Runner.app')
+IOS_APP = os.path.abspath(os.environ.get('IOS_APP', 'build/ios/iphonesimulator/Runner.app'))
 
 
 def _b64(finder):
