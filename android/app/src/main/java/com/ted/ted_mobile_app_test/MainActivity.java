@@ -1,4 +1,4 @@
-package net.azharhussain.flutter_app;
+package com.ted.ted_mobile_app_test;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

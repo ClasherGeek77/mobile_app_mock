@@ -1,13 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_driver/driver_extension.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  enableFlutterDriverExtension();
+  runApp(MyApp());
+}
+
+class Session {
+  static String user = '';
+}
+
+const kSauceUsers = ['standard_user', 'problem_user', 'performance_glitch_user', 'error_user', 'visual_user'];
+const kSaucePassword = 'secret_sauce';
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _error = '';
+
+  void _signIn() {
+    final u = _usernameController.text;
+    final p = _passwordController.text;
+    String err = '';
+    if (u.isEmpty) {
+      err = 'Epic sadface: Username is required';
+    } else if (p.isEmpty) {
+      err = 'Epic sadface: Password is required';
+    } else if (u == 'locked_out_user') {
+      err = 'Epic sadface: Sorry, this user has been locked out.';
+    } else if (!kSauceUsers.contains(u) || p != kSaucePassword) {
+      err = 'Epic sadface: Username and password do not match any user in this service';
+    }
+    if (err.isNotEmpty) {
+      setState(() => _error = err);
+      return;
+    }
+    Session.user = u;
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Login')),
+      body: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            TextField(
+              key: Key('field_username'),
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Username'),
+            ),
+            SizedBox(height: 12),
+            TextField(
+              key: Key('field_password'),
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(labelText: 'Password'),
+            ),
+            SizedBox(height: 24),
+            FlatButton(
+              key: Key('button_sign_in'),
+              color: Colors.blue,
+              child: Text('Sign In', style: TextStyle(color: Colors.white)),
+              onPressed: _signIn,
+            ),
+            if (_error.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Text(_error, key: Key('text_login_error'),
+                    style: TextStyle(color: Colors.red)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ted_mobile_app_test',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -70,6 +153,34 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          if (Session.user.isEmpty)
+            FlatButton(
+              key: Key('button_login'),
+              child: Text('Login', style: TextStyle(color: Colors.white)),
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+                setState(() {});
+              },
+            )
+          else ...[
+            FlatButton(
+              key: Key('label_current_user'),
+              child: Text(Session.user, style: TextStyle(color: Colors.white)),
+              onPressed: () {},
+            ),
+            FlatButton(
+              key: Key('button_logout'),
+              child: Text('Logout', style: TextStyle(color: Colors.white)),
+              onPressed: () {
+                Session.user = '';
+                setState(() {});
+              },
+            ),
+          ],
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
